@@ -19,7 +19,7 @@ It provides **regex-based detection and masking** of common PII patterns, inspir
 3. [Supported PII entities](#supported-pii-entities)
 4. [API reference](#api-reference)
 5. [How it works and recommended use cases](#how-it-works-and-recommended-use-cases)
-6. [Licences](#licences)
+6. [Licence](#licence)
 
 ## Features
 
