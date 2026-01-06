@@ -86,13 +86,13 @@ import { mask, FixedPIIEntity } from '@yellowsakura/js-pii-mask'
 mask("Email: test@example.com, SSN: 123-45-6789", {
   fixedPiiEntities: [FixedPIIEntity.EMAIL_ADDRESS]
 })
-// Output: "Email: <EMAIL_ADDRESS>, SSN: 123-45-6789"
+// → "Email: <EMAIL_ADDRESS>, SSN: 123-45-6789"
 
 // Mask only financial information
 mask("Card: 1234-5678-9012-3456, Email: test@example.com", {
   fixedPiiEntities: [FixedPIIEntity.CREDIT_CARD, FixedPIIEntity.US_BANK_NUMBER]
 })
-// Output: "Card: <CREDIT_CARD>, Email: test@example.com"
+// → "Card: <CREDIT_CARD>, Email: test@example.com"
 ```
 
 ### Custom rules
@@ -126,7 +126,7 @@ mask('Employee EMP-12345 (email: john@company.com) submitted ticket', {
   ],
   fixedPiiEntities: [FixedPIIEntity.EMAIL_ADDRESS]
 })
-// Output: "Employee <EMPLOYEE_ID> (email: <EMAIL_ADDRESS>) submitted ticket"
+// → "Employee <EMPLOYEE_ID> (email: <EMAIL_ADDRESS>) submitted ticket"
 ```
 
 ## Supported PII entities
