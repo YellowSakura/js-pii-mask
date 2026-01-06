@@ -1,6 +1,6 @@
 {
   "name": "@yellowsakura/js-pii-mask",
-  "version": "0.8.93",
+  "version": "0.9",
   "description": "Simple and effective PII data masking library for TypeScript/JavaScript",
   "keywords": [
     "pii",

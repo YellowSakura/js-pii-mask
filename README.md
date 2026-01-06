@@ -244,13 +244,13 @@ Deterministic, sequential, and predictable.
 
 ## Use cases
 
-✅ Test / staging data anonymization
-✅ API response redaction
-✅ Preprocessing before third-party services (e.g. LLM)
+✅ Test / staging data anonymization  
+✅ API response redaction  
+✅ Preprocessing before third-party services (e.g. LLM)  
 ✅ Masking internal identifiers
 
 ⚠️ Use with caution for:
-- Legal, medical, or financial documents
+- Legal, medical, or financial documents  
 - Automated compliance enforcement
 
 ❌ Not suitable as a standalone compliance solution.
