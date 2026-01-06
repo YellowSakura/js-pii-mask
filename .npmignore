@@ -1,0 +1,10 @@
+.DS_Store
+.git
+.gitignore
+docs/
+eslint.config.js
+jest.config.cjs
+node_modules/
+src/
+test/
+tsdown.config.ts
