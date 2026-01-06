@@ -19,7 +19,7 @@ It provides **regex-based detection and masking** of common PII patterns, inspir
 3. [Supported PII entities](#supported-pii-entities)
 4. [API reference](#api-reference)
 5. [How it works and recommended use cases](#how-it-works-and-recommended-use-cases)
-6. [Licence](#licence)
+6. [License](#license)
 
 ## Features
 
@@ -242,7 +242,7 @@ mask(text, {
 
 Deterministic, sequential, and predictable.
 
-## Use cases
+### Use cases
 
 ✅ Test / staging data anonymization  
 ✅ API response redaction  
@@ -255,7 +255,7 @@ Deterministic, sequential, and predictable.
 
 ❌ Not suitable as a standalone compliance solution.
 
-# License
+## License
 
 The code is licensed under the [MIT](https://opensource.org/licenses/MIT) by [Yellow Sakura](https://www.yellowsakura.com), [support@yellowsakura.com](mailto:support@yellowsakura.com), see the LICENSE file.  
 For more details, please refer to the [project page](https://www.yellowsakura.com/en/projects/js-pii-mask).
