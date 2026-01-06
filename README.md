@@ -258,6 +258,5 @@ Deterministic, sequential, and predictable.
 ## License
 
 The code is licensed under the [MIT](https://opensource.org/licenses/MIT) by [Yellow Sakura](https://www.yellowsakura.com), [support@yellowsakura.com](mailto:support@yellowsakura.com), see the LICENSE file.  
-For more details, please refer to the [project page](https://www.yellowsakura.com/en/projects/js-pii-mask).
 
 This library is adapted from [OpenAI's guardrails-js](https://github.com/openai/openai-guardrails-js) PII detection patterns.
