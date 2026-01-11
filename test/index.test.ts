@@ -1,38 +1,99 @@
 import { describe, test, expect } from '@jest/globals'
-import { mask, CustomRule, FixedPIIEntity } from '../src/index'
+import { mask, NlpEntity, CustomRule, FixedPIIEntity } from '../src/index'
+
+
+describe('JS PII Mask - NLP rules', () => {
+  test('should masks acronyms details', () => {
+    const output = mask('I support the WWF', {
+      nlp: true
+    })
+    expect(output).toBe('I support the <ACRONYMS>')
+  })
+
+  test('should masks money details', () => {
+    const output = mask('On vacation I spent $1,520 and exchanged €250 in currency', {
+      nlp: true
+    })
+    expect(output).toBe('On vacation I spent <MONEY> and exchanged <MONEY> in currency')
+  })
+
+  test('should masks organizations details', () => {
+    const output = mask('I like reading Wikipedia', {
+      nlp: true
+    })
+    expect(output).toBe('I like reading <ORGANIZATIONS>')
+  })
+
+  test('should masks people details', () => {
+    const output = mask('My name is John Doe and I work with Jane Smith', {
+      nlp: true
+    })
+    expect(output).toBe('My name is <PEOPLE> and I work with <PEOPLE>')
+  })
+
+  test('should masks places details', () => {
+    const output = mask('Visiting Italy was a wonderful experience', {
+      nlp: true
+    })
+    expect(output).toBe('Visiting <PLACES> was a wonderful experience')
+  })
+
+  test('should masks multiple entities (Places and acronyms)', () => {
+    const output = mask('In Geneva I visited the CERN headquarters', {
+      nlp: true
+    })
+    expect(output).toBe('In <PLACES> I visited the <ACRONYMS> headquarters')
+  })
+
+  test('should masks multiple selective entities (only places)', () => {
+    const output = mask('In Geneva I visited the CERN headquarters', {
+      nlpRules: [NlpEntity.PLACES]
+    })
+    expect(output).toBe('In <PLACES> I visited the CERN headquarters')
+  })
+
+  // The test fails because the Compromise library has limitations in handling
+  // place names written in Italian, such as Geneva (Ginevra).
+  test.failing('should masks multiple entities in multiple languages (Places and acronyms)', () => {
+    const output = mask('A Ginevra ho visitato la sede del CERN', {
+      nlp: true
+    })
+    expect(output).toBe('In <PLACES> ho visitato la sede del <ACRONYMS>')
+  })
+})
 
 describe('JS PII Mask - Custom rules', () => {
-    test('should mask first and last name', () => {
-      const output = mask('I\'m John Doe, nice to meet you.', {
-        customRules: [
-            {
-                pattern: /John/gi,
-                replacement: 'FIRST_NAME'
-            },
-            {
-                pattern: /Doe/gi,
-                replacement: 'LAST_NAME'
-            }
-        ] as CustomRule[]
-      })
-      expect(output).toBe('I\'m <FIRST_NAME> <LAST_NAME>, nice to meet you.')
+  test('should mask first and last name', () => {
+    const output = mask('I\'m John Doe, nice to meet you.', {
+      customRules: [
+        {
+          pattern: /John/gi,
+          replacement: 'FIRST_NAME'
+        },
+        {
+          pattern: /Doe/gi,
+          replacement: 'LAST_NAME'
+        }
+      ] as CustomRule[]
     })
+    expect(output).toBe('I\'m <FIRST_NAME> <LAST_NAME>, nice to meet you.')
+  })
 
-    test('should mask custom ticket and employee ID', () => {
-      const output = mask('Ticket T-123 assigned to EMP-99999', {
-        customRules: [
-            {
-                pattern: /T-\d{3}/g,
-                replacement: "TICKET_ID"
-            },
-            {
-                pattern: /EMP-\d{5}/g,
-                replacement: "EMPLOYEE_ID"
-            }
-        ] as CustomRule[]
-      })
-      expect(output).toBe('Ticket <TICKET_ID> assigned to <EMPLOYEE_ID>')
+  test('should mask custom ticket and employee ID', () => {
+    const output = mask('Ticket T-123 assigned to EMP-99999', {
+      customRules: [
+        {
+          pattern: /T-\d{3}/g,
+          replacement: "TICKET_ID"
+        },
+        {
+          pattern: /EMP-\d{5}/g,
+          replacement: "EMPLOYEE_ID"
+        }
+      ] as CustomRule[]
     })
+    expect(output).toBe('Ticket <TICKET_ID> assigned to <EMPLOYEE_ID>')
+  })
 })
 
 describe('JS PII Mask - Fixed rules', () => {
@@ -170,7 +231,7 @@ describe('JS PII Mask - Fixed rules', () => {
   describe('UK PII Entities', () => {
     test('should mask UK National Health Service numbers (with entity FixedPIIEntity.UK_NHS)', () => {
       const output = mask('NHS: 123 456 7890', {
-          fixedPiiEntities: [FixedPIIEntity.UK_NHS] // RULES COLLISION, in test cases, the check only works if the UK_NHS entity is passed otherwise, an overlap may occur with the regular expression used for the general phone number check
+        fixedPiiEntities: [FixedPIIEntity.UK_NHS] // RULES COLLISION, in test cases, the check only works if the UK_NHS entity is passed otherwise, an overlap may occur with the regular expression used for the general phone number check
       })
       expect(output).toBe('NHS: <UK_NHS>')
     })
@@ -226,7 +287,7 @@ describe('JS PII Mask - Fixed rules', () => {
   describe('Other European PII Entities', () => {
     test('should mask Polish national identification number (Powszechny Elektroniczny System Ewidencji Ludności - PESEL)', () => {
       const output = mask('PESEL: 12345678901', {
-          fixedPiiEntities: [FixedPIIEntity.PL_PESEL] // RULES COLLISION, in test cases, the check only works if the PL_PESEL entity is passed; otherwise, an overlap may occur with the regular expression used for the USA Bank number
+        fixedPiiEntities: [FixedPIIEntity.PL_PESEL] // RULES COLLISION, in test cases, the check only works if the PL_PESEL entity is passed; otherwise, an overlap may occur with the regular expression used for the USA Bank number
       })
       expect(output).toBe('PESEL: <PL_PESEL>')
     })
@@ -251,7 +312,7 @@ describe('JS PII Mask - Fixed rules', () => {
 
     test('should mask Singapore Unique Entity Number (UEN - 9 digits)', () => {
       const output = mask('UEN: 53499876V', {
-          fixedPiiEntities: [FixedPIIEntity.SG_UEN] // RULES COLLISION, in test cases, the check only works if the SG_UEN entity is passed; otherwise, an overlap may occur with the regular expression used for the Spanish NIF
+        fixedPiiEntities: [FixedPIIEntity.SG_UEN] // RULES COLLISION, in test cases, the check only works if the SG_UEN entity is passed; otherwise, an overlap may occur with the regular expression used for the Spanish NIF
       })
       expect(output).toBe('UEN: <SG_UEN>')
     })
@@ -276,7 +337,7 @@ describe('JS PII Mask - Fixed rules', () => {
 
     test('should mask Australian Tax File Number', () => {
       const output = mask('TFN: 123456789', {
-          fixedPiiEntities: [FixedPIIEntity.AU_TFN] // RULES COLLISION, in test cases, the check only works if the AU_TFN entity is passed; otherwise, an overlap may occur with the regular expression used for the USA Bank number
+        fixedPiiEntities: [FixedPIIEntity.AU_TFN] // RULES COLLISION, in test cases, the check only works if the AU_TFN entity is passed; otherwise, an overlap may occur with the regular expression used for the USA Bank number
       })
       expect(output).toBe('TFN: <AU_TFN>')
     })
@@ -301,7 +362,7 @@ describe('JS PII Mask - Fixed rules', () => {
 
     test('should mask Indian passport', () => {
       const output = mask('Passport: A1234567', {
-          fixedPiiEntities: [FixedPIIEntity.IN_PASSPORT] // RULES COLLISION, in test cases, the check only works if the AU_TFN entity is passed; otherwise, an overlap may occur with the regular expression used for the USA Driver License
+        fixedPiiEntities: [FixedPIIEntity.IN_PASSPORT] // RULES COLLISION, in test cases, the check only works if the AU_TFN entity is passed; otherwise, an overlap may occur with the regular expression used for the USA Driver License
       })
       expect(output).toBe('Passport: <IN_PASSPORT>')
     })

@@ -8,9 +8,9 @@
 
 Simple lightweight PII (Personally Identifiable Information) masking library for **TypeScript / JavaScript**.
 
-It provides **regex-based detection and masking** of common PII patterns, inspired by [OpenAI's guardrails-js](https://github.com/openai/openai-guardrails-js), with a strong focus on **simplicity, predictability, and extensibility**.
+It provides **regex-based detection and masking** of common PII patterns, inspired by [OpenAI's guardrails-js](https://github.com/openai/openai-guardrails-js), with **basic NLP capabilities** to enhance its detection power, and a strong focus on simplicity, predictability, and extensibility.
 
-> ⚠️ Heuristic-based detection: useful in practice, **not a compliance guarantee**.
+> Heuristic-based detection: useful in practice, **not a compliance guarantee**.
 
 ## Contents
 
@@ -25,7 +25,8 @@ It provides **regex-based detection and masking** of common PII patterns, inspir
 
 - 🔎 Detects **35+ common PII types** (global + regional)
 - 🧩 **Custom rules** for managing specific domains
-- ⚡ Fast, dependency-free, sequential processing
+- ⚡ Fast, sequential processing
+- 🧠 **Optional lightweight NLP** for dynamic named entities (names, places, orgs)
 - ❌ **Cannot**: Understand semantic context or perform deep NLP analysis
 - 🔍 **Trade-offs**: Balanced for minimal false positives, but may miss some edge cases
 
@@ -83,13 +84,13 @@ mask('Email: admin@example.com, SSN: 123-45-6789')
 import { mask, FixedPIIEntity } from '@yellowsakura/js-pii-mask'
 
 // Mask only specific entity types
-mask("Email: test@example.com, SSN: 123-45-6789", {
+mask('Email: test@example.com, SSN: 123-45-6789', {
   fixedPiiEntities: [FixedPIIEntity.EMAIL_ADDRESS]
 })
 // → "Email: <EMAIL_ADDRESS>, SSN: 123-45-6789"
 
 // Mask only financial information
-mask("Card: 1234-5678-9012-3456, Email: test@example.com", {
+mask('Card: 1234-5678-9012-3456, Email: test@example.com', {
   fixedPiiEntities: [FixedPIIEntity.CREDIT_CARD, FixedPIIEntity.US_BANK_NUMBER]
 })
 // → "Card: <CREDIT_CARD>, Email: test@example.com"
@@ -129,9 +130,37 @@ mask('Employee EMP-12345 (email: john@company.com) submitted ticket', {
 // → "Employee <EMPLOYEE_ID> (email: <EMAIL_ADDRESS>) submitted ticket"
 ```
 
+### Using NLP (Lightweight)
+
+You can enable **N**atural **L**anguage **P**rocessing to detect dynamic entities like names, places, and organizations.  
+This uses the [compromise](https://www.npmjs.com/package/compromise) library.
+
+```ts
+import { mask, NlpEntity } from '@yellowsakura/js-pii-mask'
+
+// Enable default NLP entities (People, Places, Orgs, etc.)
+mask('John Smith visited Paris', { nlp: true })
+// → "<PEOPLE> visited <PLACES>"
+
+// Selective NLP entities
+mask('Google bought Fitbit for $2.1 billion', { 
+  nlpRules: [NlpEntity.ORGS, NlpEntity.MONEY] 
+})
+// → "<ORGS> bought <ORGS> for <MONEY>"
+```
+
+> **⚠️ NLP Limitations & Best Practices**
+> 
+> The NLP feature is powered by `compromise`, a lightweight library designed to be fast rather than perfect.
+>
+> - **Language Support**: Optimized primarily for **English**. Accuracy in other languages is limited.
+> - **Accuracy**: Expect higher false positives/negatives than deep-learning based NER models.
+> - **Performance**: Little slower than pure regex regex-based masking.
+```
+
 ## Supported PII entities
 
-The library includes **35+ predefined patterns**, including:
+The library includes **40+ predefined patterns**, including:
 
 ### Global
 - EMAIL_ADDRESS
@@ -142,6 +171,13 @@ The library includes **35+ predefined patterns**, including:
 - URL
 - DATE_TIME
 
+### NLP Entities (Dynamic)
+- PEOPLE (Names)
+- PLACES (Locations, Cities, Countries)
+- ORGS (Organizations, Companies)
+- MONEY (Currency amounts)
+- ACRONYMS
+
 ### Country-specific (examples)
 - US: SSN, Passport, Bank Number, ITIN
 - UK: NHS, NINO
@@ -150,7 +186,7 @@ The library includes **35+ predefined patterns**, including:
 
 Some entities require **context keywords** (e.g. `CVV`, `BIC_SWIFT`) to reduce false positives.
 
-For overlapping patterns, explicitly specify `fixedPiiEntities`, see [`src/pii-fixed-rules.ts`](./src/pii-fixed-rules.ts) for an exhaustive list.
+See [`src/pii-nlp.ts`](./src/pii-nlp.ts) and [`src/pii-fixed-rules.ts`](./src/pii-fixed-rules.ts) for an exhaustive list.
 
 ## API reference
 
@@ -169,10 +205,22 @@ type MaskOptions = {
   // Array of custom masking rules (always applied FIRST)
   customRules?: CustomRule[]
 
+  // Enable NLP processing (default: false)
+  nlp?: boolean
+
+  // Specific NLP entities to detect (default: all if nlp=true)
+  nlpRules?: NlpEntity[]
+
   // Array of specific fixed PII entities to detect (always applied AFTER custom rules)
   // If empty or undefined, ALL fixed entities are checked
   fixedPiiEntities?: FixedPIIEntity[]
 }
+```
+
+**Order of execution:**
+1. **NLP Rules** (if enabled)
+2. **Custom Rules** (if defined)
+3. **Fixed PII Rules**
 ```
 
 **Returns:** 
@@ -198,12 +246,6 @@ interface CustomRule {
 
 **Examples:**
 ```ts
-// Good: Specific pattern with word boundaries
-{
-  pattern: /\bEMP-\d{5}\b/g,
-  replacement: 'EMPLOYEE_ID'
-}
-
 // Good: Case-insensitive matching
 {
   pattern: /ticket-[a-z0-9]{8}/gi,

@@ -1,3 +1,4 @@
+import { applyNlpRules, NlpEntity } from './pii-nlp'
 import { applyCustomRules, CustomRule } from './pii-custom-rules'
 import { applyFixedRules, FixedPIIEntity } from './pii-fixed-rules'
 
@@ -5,6 +6,7 @@ import { applyFixedRules, FixedPIIEntity } from './pii-fixed-rules'
 // (pii-custom-rules and pii-fixed-rules) remain internal.
 export type { CustomRule } from './pii-custom-rules'
 export { FixedPIIEntity } from './pii-fixed-rules'
+export { NlpEntity } from './pii-nlp'
 
 /**
  * Normalizes a Unicode string and removes invisible zero-width characters.
@@ -53,6 +55,8 @@ function _normalizeUnicode(text: string): string {
  * Both properties are optional.
  */
 type MaskOptions = {
+  nlp?: boolean
+  nlpRules?: NlpEntity[]
   customRules?: CustomRule[]
   fixedPiiEntities?: FixedPIIEntity[]
 }
@@ -84,14 +88,19 @@ type MaskOptions = {
  * // Returns: "My name is <FIRST_NAME> <LAST_NAME>"
  */
 export function mask(inputText: string, options?: MaskOptions): string {
-  const { customRules = [], fixedPiiEntities = [] } = options || {}
+  const { nlp = false, nlpRules = [], customRules = [], fixedPiiEntities = [] } = options || {}
   let text = _normalizeUnicode(inputText)
 
-  // Apply custom rules first (if provided)
+  // Apply NLP rules
+  if (nlp || nlpRules.length > 0) {
+    text = (nlpRules.length == 0) ? applyNlpRules(text) : applyNlpRules(text, nlpRules)
+  }
+
+  // Apply custom rules
   if (customRules.length > 0) {
     text = applyCustomRules(text, customRules)
   }
 
-  // Apply fixed rules after custom rules
+  // Apply fixed rules
   return (fixedPiiEntities.length > 0) ? applyFixedRules(text, fixedPiiEntities) : applyFixedRules(text)
 }
