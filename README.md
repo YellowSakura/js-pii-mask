@@ -256,10 +256,27 @@ interface CustomRule {
   replacement: 'NUMBER'
 }
 ```
+### `NlpEntity` Enum
+
+Enumeration of all predefined NLP entity types, import to specify which entities to detect:
+
+```ts
+import { NlpEntity } from '@yellowsakura/js-pii-mask'
+
+mask(text, {
+  nlpRules: [
+    NlpEntity.ACRONYMS,
+    NlpEntity.MONEY,
+    NlpEntity.ORGS,
+    NlpEntity.PEOPLE,
+    NlpEntity.PLACES
+  ]
+})
+```
 
 ### `FixedPIIEntity` Enum
 
-Enumeration of all predefined PII entity types. Import to specify which entities to detect:
+Enumeration of all predefined PII entity types, import to specify which entities to detect:
 
 ```ts
 import { FixedPIIEntity } from '@yellowsakura/js-pii-mask'
@@ -268,7 +285,8 @@ mask(text, {
   fixedPiiEntities: [
     FixedPIIEntity.EMAIL_ADDRESS,
     FixedPIIEntity.PHONE_NUMBER,
-    FixedPIIEntity.US_SSN
+    FixedPIIEntity.US_SSN,
+    ...
   ]
 })
 ```
