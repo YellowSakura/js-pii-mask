@@ -27,7 +27,6 @@ It provides **regex-based detection and masking** of common PII patterns, inspir
 - 🧩 **Custom rules** for managing specific domains
 - ⚡ Fast, sequential processing
 - 🧠 **Optional lightweight NLP** for dynamic named entities (names, places, orgs)
-- ❌ **Cannot**: Understand semantic context or perform deep NLP analysis
 - 🔍 **Trade-offs**: Balanced for minimal false positives, but may miss some edge cases
 
 This library is **pattern-based**.
@@ -38,7 +37,7 @@ This library is **pattern-based**.
 **Does NOT**:
 - Understand semantic context
 - Detect unstructured personal data
-- Perform NER or NLP
+- Perform deep NER or NLP
 - Guarantee 100% accuracy
 
 **Expect**:
@@ -156,7 +155,6 @@ mask('Google bought Fitbit for $2.1 billion', {
 > - **Language Support**: Optimized primarily for **English**. Accuracy in other languages is limited.
 > - **Accuracy**: Expect higher false positives/negatives than deep-learning based NER models.
 > - **Performance**: Little slower than pure regex regex-based masking.
-```
 
 ## Supported PII entities
 
