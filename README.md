@@ -294,9 +294,9 @@ mask(text, {
 ## How it works and recommended use cases:
 
 1. Unicode normalization (NFKC, zero-width removal)
-2. Apply custom rules (in order)
-3. Apply fixed PII rules (all or selected)
-4. Replace matches inline
+2. Apply NLP Rules
+3. Apply custom rules (in order)
+4. Apply fixed PII rules (all or selected)
 
 Deterministic, sequential, and predictable.
 
