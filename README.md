@@ -23,7 +23,7 @@ It provides **regex-based detection and masking** of common PII patterns, inspir
 
 ## Features
 
-- 🔎 Detects **35+ common PII types** (global + regional)
+- 🔎 Detects **40+ common PII types** (global + regional)
 - 🧩 **Custom rules** for managing specific domains
 - ⚡ Fast, sequential processing
 - 🧠 **Optional lightweight NLP** for dynamic named entities (names, places, orgs)
