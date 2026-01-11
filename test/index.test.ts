@@ -513,7 +513,7 @@ describe('JS PII Mask - Fixed rules', () => {
     test('should handle long text efficiently', () => {
       const longText = 'Email: test@example.com. '.repeat(100)
       const startTime = Date.now()
-      const output = mask(longText)
+      const output = mask(longText, { nlp: true })
       const endTime = Date.now()
 
       expect(endTime - startTime).toBeLessThan(1000) // Should complete in under 1 second
@@ -532,6 +532,7 @@ describe('JS PII Mask - Fixed rules', () => {
 
     test('should handle many different PII types in one text', () => {
       const output = mask(`
+        Name: John Doe
         Email: test@example.com
         Phone: 555-123-4567
         SSN: 123-45-6789
@@ -540,8 +541,9 @@ describe('JS PII Mask - Fixed rules', () => {
         URL: https://example.com
         IBAN: DE89370400440532013000
         Passport: A12345678
-      `)
+      `, { nlp: true })
 
+      expect(output).toContain('<PEOPLE>')
       expect(output).toContain('<EMAIL_ADDRESS>')
       expect(output).toContain('<PHONE_NUMBER>')
       expect(output).toContain('<US_SSN>')
